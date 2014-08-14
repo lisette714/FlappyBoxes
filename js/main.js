@@ -26,7 +26,7 @@ var mainState = {
     //Start our Physics Engine
     game.physics.startSystem(Phaser.Physics.ARCADE);
     
-    this.bird = this.game.add.srite(100, 250, 'bird');
+    this.bird = this.game.add.sprite(100, 250, 'bird');
     
    
     game.physics.arcade.enable(this.bird);
@@ -44,11 +44,16 @@ var mainState = {
     this.pipes.createMultiple(20, 'pipe');
     
     //Add in pipes over 1.5 seconds to the screen
-    this.timer = game.time.events.loop(1500, this.addRowOfPipes,this);
+    this.timer = game.time.events.loop(1500, this.addRowOfPipes, this);
     
     //when spacebar is pressed, make the bird jump! 
     var spaceKey = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
     spaceKey.onDown.add(this.jump, this);
+    
+    
+    this.score = 0;
+    
+    this.labelScore = game.add.text(20,20, "0", {font: "30px Arial", fill: "#ffffff"});
     
   },
   
@@ -59,6 +64,9 @@ var mainState = {
     if (this.bird.inWorld == false) {
       this.restartGame();
     }
+    
+    game.physics.arcade.overlap(this.bird, this.pipes, this.restartGame, null, this);
+    
   },
   
   addOnePipe: function(x,y) {
@@ -79,25 +87,29 @@ var mainState = {
   addRowOfPipes: function () {
     var hole = Math.floor(Math.random() * 5) + 1;
     
-    for(var i=0; i < 8; i++){
+    for(var i=0; i < 8; i++)
     
       if(i != hole && i != hole + 1) {
         
         this.addOnePipe(400, i*60 + 10);
       }
-     },
+      
+      this.score += 1;
+      this.labelScore.text = this.score;
+      
+   },
 
 
-      jump: function() {
+      jump: function () {
     //Let's add vertical velocity to the bird when the spacebar is pressed down
     
     this.bird.body.velocity.y = -350;
-    },
+},
   
-  restartGame: function () {
+  restartGame: function() {
     
-    game.state.start('main');
-  },
+  game.state.start('main');
+},
   
 }
 
